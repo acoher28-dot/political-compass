@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Political Compass Self-Check (Adaptive)</title>
+<style>
+  :root { --ink:#1d1d1f; --muted:#6b6b70; --line:#e2e2e6; --accent:#2f5d8a; --bg:#fafaf8; --good:#3b7a57; --warn:#a4553a; }
+  * { box-sizing: border-box; }
+  body { font-family: Georgia, "Times New Roman", serif; color: var(--ink); background: var(--bg); margin: 0; padding: 24px; line-height: 1.5; }
+  .wrap { max-width: 780px; margin: 0 auto; }
+  h1 { font-size: 1.7rem; margin: 0 0 4px; }
+  h2 { font-size: 1.25rem; margin: 6px 0 8px; }
+  .sub { color: var(--muted); margin: 0 0 18px; font-size: 0.95rem; }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; margin-bottom: 14px; }
+  .q { margin: 0 0 6px; font-size: 1.02rem; }
+  .topic { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+  .scale { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .scale label { flex: 1; min-width: 80px; text-align: center; border: 1px solid var(--line); border-radius: 6px; padding: 8px 4px; cursor: pointer; font-size: 0.8rem; color: var(--muted); user-select: none; }
+  .scale input { display: none; }
+  .scale label:has(input:checked) { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button { font: inherit; background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 12px 18px; cursor: pointer; font-size: 1rem; margin-right: 6px; margin-top: 6px; }
+  button.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  button:disabled { background: #aab; cursor: not-allowed; }
+  button.small { padding: 8px 12px; font-size: 0.9rem; }
+  .row { display: flex; gap: 10px; align-items: center; justify-content: space-between; margin-top: 12px; flex-wrap: wrap; }
+  .progress { color: var(--muted); font-size: 0.9rem; margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin-bottom: 18px; }
+  .bar > div { height: 100%; background: var(--accent); width: 0; transition: width .2s; }
+  .hidden { display: none; }
+  .meter { position: relative; height: 10px; background: linear-gradient(90deg, #d9e3ee, #f1f1f1, #d9e3ee); border-radius: 5px; margin: 6px 0 14px; }
+  .meter .tick { position: absolute; top: -4px; width: 4px; height: 18px; background: var(--ink); border-radius: 2px; transform: translateX(-2px); }
+  .meter-labels { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--muted); }
+  .topic-row { display: grid; grid-template-columns: 170px 1fr 110px; gap: 10px; align-items: center; margin: 6px 0; font-size: 0.92rem; }
+  .topic-bar { position: relative; height: 8px; background: var(--line); border-radius: 4px; }
+  .topic-bar .mid { position: absolute; left: 50%; top: -3px; width: 1px; height: 14px; background: #999; }
+  .topic-bar .fill { position: absolute; top: 0; height: 100%; background: var(--accent); border-radius: 4px; }
+  .stmt { font-size: 0.93rem; margin: 6px 0; padding-left: 10px; border-left: 3px solid var(--line); }
+  .good { color: var(--good); } .warn { color: var(--warn); }
+  .note { color: var(--muted); font-size: 0.85rem; margin-top: 12px; }
+  ul { padding-left: 20px; margin: 6px 0; }
+  li { margin: 6px 0; }
+  .tag { display: inline-block; font-size: 0.75rem; background: #eef2f7; color: var(--accent); border-radius: 4px; padding: 1px 6px; margin-left: 4px; }
+  .ideo { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .ideo:last-child { border-bottom: 0; }
+  .ideo small { color: var(--muted); display: block; }
+  .score { font-variant-numeric: tabular-nums; color: var(--accent); white-space: nowrap; }
+  .book { margin: 6px 0; }
+  .book em { color: var(--muted); font-style: normal; }
+  .interests label { display: inline-block; margin: 4px 10px 4px 0; font-size: 0.95rem; }
+  .export { display: flex; gap: 8px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Free Political Compass Self-Check</h1>
+  <p class="sub">A two-round, adaptive self-check. Round 1 has 50 statements. Round 2 asks about the topics where your views are least settled. You can export your results and see which ideology fits you most closely, with book suggestions. Nothing is sent anywhere unless you choose to send your anonymous results at the end.</p>
+
+  <!-- Intro -->
+  <div id="intro" class="card">
+    <h2 style="margin-top:0">Before you start</h2>
+    <p>Pick any interests you want the book suggestions to reflect. This is optional and stays on this page.</p>
+    <div class="interests" id="interestBox">
+      <label><input type="checkbox" value="Finance"> Finance</label>
+      <label><input type="checkbox" value="History"> History</label>
+      <label><input type="checkbox" value="Philosophy"> Philosophy</label>
+      <label><input type="checkbox" value="Debate"> Debate</label>
+      <label><input type="checkbox" value="Psychology"> Psychology</label>
+    </div>
+    <button id="startBtn">Start</button>
+  </div>
+
+  <!-- Quiz -->
+  <div id="quiz" class="hidden">
+    <div class="progress"><span id="progress"></span><span id="pct"></span></div>
+    <div class="bar"><div id="barFill"></div></div>
+    <div id="questions"></div>
+    <div class="row" id="navRow">
+      <button class="ghost" id="backBtn">Back</button>
+      <button id="nextBtn" disabled>Next</button>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="results" class="hidden">
+    <div class="card">
+      <h2 style="margin-top:0">Your overall result</h2>
+      <svg id="plot" viewBox="0 0 400 400" width="100%" style="max-width:380px;display:block;margin:0 auto">
+        <rect x="0" y="0" width="400" height="400" fill="#fff" stroke="#ccc"/>
+        <line x1="200" y1="0" x2="200" y2="400" stroke="#bbb"/>
+        <line x1="0" y1="200" x2="400" y2="200" stroke="#bbb"/>
+        <text x="8" y="18" font-size="12" fill="#6b6b70">Order and tradition</text>
+        <text x="392" y="18" font-size="12" fill="#6b6b70" text-anchor="end">Personal liberty</text>
+        <text x="8" y="392" font-size="12" fill="#6b6b70">Government role</text>
+        <text x="392" y="392" font-size="12" fill="#6b6b70" text-anchor="end">Market role</text>
+        <circle id="dot" cx="200" cy="200" r="8" fill="#2f5d8a"/>
+      </svg>
+      <p id="econLine" style="margin:14px 0 2px"></p>
+      <div class="meter"><div class="tick" id="econTick"></div></div>
+      <div class="meter-labels"><span>Government-led</span><span>Middle</span><span>Market-led</span></div>
+      <p id="socLine" style="margin:14px 0 2px"></p>
+      <div class="meter"><div class="tick" id="socTick"></div></div>
+      <div class="meter-labels"><span>Order and tradition</span><span>Middle</span><span>Personal liberty</span></div>
+      <p id="quadLine" style="margin-top:14px"></p>
+      <p id="crossLine"></p>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0">Closest ideologies</h2>
+      <p class="note" style="margin-top:0">Your topic-by-topic answers compared with 30 simplified ideology profiles. Closeness is out of 100. Treat these as rough labels, not identities.</p>
+      <div id="ideoList"></div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0">Book suggestions</h2>
+      <p class="note" style="margin-top:0">Titles are starting points. Check details before you buy or cite them.</p>
+      <div id="books"></div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0">Topic breakdown</h2>
+      <p class="note" style="margin-top:0">Each bar shows where your answers on that topic fall. The center line is neutral.</p>
+      <div id="topics"></div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0">Insights</h2>
+      <div id="insights"></div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0">Statements you felt strongest about</h2>
+      <div id="strong"></div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0">Questions to think about</h2>
+      <ul id="reflect"></ul>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0">Result code and export</h2>
+      <p class="note" style="margin-top:0">Your result code summarizes your scores and how many statements you looked up. It has no name or personal information.</p>
+      <p><code id="codeText" style="font-size:1.05rem"></code> <button class="small ghost" id="copyBtn">Copy code</button></p>
+      <div id="submitBox" class="hidden" style="margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:8px">
+        <label><input type="checkbox" id="consentBox"> I agree to send my anonymous results to this project.</label>
+        <p class="note" style="margin:6px 0">What is sent: your scores, your topic scores, how many statements you marked "Don't know", your reading level, and your result code. This page does not collect a name, email, or device information.</p>
+        <button class="small" id="sendBtn" disabled>Send my anonymous results</button> <span id="sendMsg" class="note"></span>
+      </div>
+      <div class="export">
+        <button class="small" id="csvBtn">Download CSV</button>
+        <button class="small" id="xlsBtn">Download Excel (.xlsx)</button>
+      </div>
+    </div>
+
+    <p class="note">This is a rough self-reflection tool, not a validated psychological or political assessment. Answers can shift with mood, the news, or how a statement was read. Use the result as a starting point for thinking, not a verdict.</p>
+    <button id="restartBtn" style="margin-top:8px">Take it again</button>
+  </div>
+</div>
+
+<script>
+// ---------- Topics ----------
+const TOPICS = ["Taxes","Healthcare","Regulation","Labor and wages","Welfare and education",
+                "Speech and expression","Privacy and security","Personal choice","Tradition and identity","Rights and freedoms"];
+// Economic topics: +1 = market, -1 = government role. Social topics: +1 = liberty/change, -1 = order/tradition.
+
+// ---------- Round 1 (core) ----------
+const CORE = [
+  { t: "Higher earners should pay a much larger share of their income in taxes.", axis: "E", dir: -1, topic: "Taxes" },
+  { t: "Cutting taxes usually boosts growth more than the same money spent by government would.", axis: "E", dir: 1, topic: "Taxes" },
+  { t: "Taxes on large inheritances are fair.", axis: "E", dir: -1, topic: "Taxes" },
+  { t: "Government spending should be cut before taxes are raised.", axis: "E", dir: 1, topic: "Taxes" },
+  { t: "Large corporations should pay a higher tax rate.", axis: "E", dir: -1, topic: "Taxes" },
+  { t: "Government should guarantee healthcare coverage for everyone.", axis: "E", dir: -1, topic: "Healthcare" },
+  { t: "Private health insurance should remain the main way most people get coverage.", axis: "E", dir: 1, topic: "Healthcare" },
+  { t: "Government should set or cap prescription drug prices.", axis: "E", dir: -1, topic: "Healthcare" },
+  { t: "Patient care improves when private providers compete for customers.", axis: "E", dir: 1, topic: "Healthcare" },
+  { t: "Public insurance programs should be expanded to cover more age groups.", axis: "E", dir: -1, topic: "Healthcare" },
+  { t: "Major industries such as energy and banking need strict government oversight.", axis: "E", dir: -1, topic: "Regulation" },
+  { t: "Most government regulations cost more than they are worth.", axis: "E", dir: 1, topic: "Regulation" },
+  { t: "Banks need tighter rules to prevent another financial crisis.", axis: "E", dir: -1, topic: "Regulation" },
+  { t: "Environmental standards should be set by government even when they raise consumer prices.", axis: "E", dir: -1, topic: "Regulation" },
+  { t: "Businesses should choose their own ways of meeting environmental goals.", axis: "E", dir: 1, topic: "Regulation" },
+  { t: "Minimum wage laws do more harm than good.", axis: "E", dir: 1, topic: "Labor and wages" },
+  { t: "Labor unions are essential to protecting workers.", axis: "E", dir: -1, topic: "Labor and wages" },
+  { t: "Workers and employers should negotiate pay without government mandates.", axis: "E", dir: 1, topic: "Labor and wages" },
+  { t: "Paid family leave should be required by law.", axis: "E", dir: -1, topic: "Labor and wages" },
+  { t: "Employers should set schedules and benefits without government rules.", axis: "E", dir: 1, topic: "Labor and wages" },
+  { t: "Public colleges should be free for students who qualify.", axis: "E", dir: -1, topic: "Welfare and education" },
+  { t: "Government should guarantee a basic income floor for people who cannot work.", axis: "E", dir: -1, topic: "Welfare and education" },
+  { t: "School vouchers that let families choose schools improve education.", axis: "E", dir: 1, topic: "Welfare and education" },
+  { t: "Housing is best supplied mostly by private builders rather than public agencies.", axis: "E", dir: 1, topic: "Welfare and education" },
+  { t: "Charities and communities serve people better than government welfare programs do.", axis: "E", dir: 1, topic: "Welfare and education" },
+  { t: "People should be able to voice unpopular opinions without legal consequences.", axis: "S", dir: 1, topic: "Speech and expression" },
+  { t: "Hate speech should be restricted by law.", axis: "S", dir: -1, topic: "Speech and expression" },
+  { t: "Offensive protests are still protected speech even when they upset people.", axis: "S", dir: 1, topic: "Speech and expression" },
+  { t: "Schools and universities should limit speech that students find offensive.", axis: "S", dir: -1, topic: "Speech and expression" },
+  { t: "Government should set legal rules for when online platforms remove content.", axis: "S", dir: -1, topic: "Speech and expression" },
+  { t: "Government may monitor communications if it helps prevent crime.", axis: "S", dir: -1, topic: "Privacy and security" },
+  { t: "Strong encryption should be available even if police cannot access the data.", axis: "S", dir: 1, topic: "Privacy and security" },
+  { t: "Police should have broader powers to maintain public order.", axis: "S", dir: -1, topic: "Privacy and security" },
+  { t: "Surveillance cameras in public spaces make communities safer.", axis: "S", dir: -1, topic: "Privacy and security" },
+  { t: "Individuals should be able to shield personal data from government access.", axis: "S", dir: 1, topic: "Privacy and security" },
+  { t: "Adults should decide for themselves what substances to use, with minimal penalties.", axis: "S", dir: 1, topic: "Personal choice" },
+  { t: "Government should not dictate what people do with their own bodies.", axis: "S", dir: 1, topic: "Personal choice" },
+  { t: "Adults should be free to live by personal choices others consider immoral, if no one is harmed.", axis: "S", dir: 1, topic: "Personal choice" },
+  { t: "Sex work should be fully criminalized.", axis: "S", dir: -1, topic: "Personal choice" },
+  { t: "Assisted dying should be legal for competent adults with terminal illness.", axis: "S", dir: 1, topic: "Personal choice" },
+  { t: "Traditional values should guide public policy more than changing social norms.", axis: "S", dir: -1, topic: "Tradition and identity" },
+  { t: "Schools should teach a shared set of cultural and moral standards.", axis: "S", dir: -1, topic: "Tradition and identity" },
+  { t: "A strong shared national identity is essential to a healthy society.", axis: "S", dir: -1, topic: "Tradition and identity" },
+  { t: "Religious groups should be free from government rules about their internal practices.", axis: "S", dir: 1, topic: "Tradition and identity" },
+  { t: "Immigration policy should prioritize preserving the nation's existing cultural cohesion.", axis: "S", dir: -1, topic: "Tradition and identity" },
+  { t: "Same-sex couples should have the same legal rights as other couples.", axis: "S", dir: 1, topic: "Rights and freedoms" },
+  { t: "Government should not restrict how families choose to raise their children.", axis: "S", dir: 1, topic: "Rights and freedoms" },
+  { t: "Gun ownership rights should be protected from most government restrictions.", axis: "S", dir: 1, topic: "Rights and freedoms" },
+  { t: "Public order matters more than individual freedom to protest.", axis: "S", dir: -1, topic: "Rights and freedoms" },
+  { t: "Government should not decide which books or artworks are available to the public.", axis: "S", dir: 1, topic: "Rights and freedoms" }
+];
+
+// ---------- Round 2 bank (adaptive: chosen by topic uncertainty) ----------
+const BANK = [
+  { t: "A flat tax with few deductions is fairer than a progressive tax.", axis: "E", dir: 1, topic: "Taxes" },
+  { t: "Wealth taxes on the largest fortunes are workable and worth doing.", axis: "E", dir: -1, topic: "Taxes" },
+  { t: "Tax credits for working families do more good than raising the minimum wage.", axis: "E", dir: 1, topic: "Taxes" },
+  { t: "Hospitals should be required to publish clear, standardized prices.", axis: "E", dir: -1, topic: "Healthcare" },
+  { t: "People should be able to buy health plans across state lines with few rules.", axis: "E", dir: 1, topic: "Healthcare" },
+  { t: "A single public insurer would control costs better than competing private insurers.", axis: "E", dir: -1, topic: "Healthcare" },
+  { t: "Zoning and permit rules make housing too expensive and should be scaled back.", axis: "E", dir: 1, topic: "Regulation" },
+  { t: "Government should be able to break up companies that become too dominant.", axis: "E", dir: -1, topic: "Regulation" },
+  { t: "Occupational licensing protects the public more than it limits workers.", axis: "E", dir: -1, topic: "Regulation" },
+  { t: "Gig workers should receive the same benefits as traditional employees.", axis: "E", dir: -1, topic: "Labor and wages" },
+  { t: "Right-to-work laws protect individual workers' freedom.", axis: "E", dir: 1, topic: "Labor and wages" },
+  { t: "Retirement savings should be enrolled automatically by default.", axis: "E", dir: -1, topic: "Labor and wages" },
+  { t: "Means-tested benefits create dependency and should be reduced.", axis: "E", dir: 1, topic: "Welfare and education" },
+  { t: "Universal childcare should be publicly funded.", axis: "E", dir: -1, topic: "Welfare and education" },
+  { t: "Standardized testing is a fair way to hold schools accountable.", axis: "E", dir: -1, topic: "Welfare and education" },
+  { t: "Public universities should not punish professors for controversial research or speech.", axis: "S", dir: 1, topic: "Speech and expression" },
+  { t: "Social media companies should be legally required to remove misinformation.", axis: "S", dir: -1, topic: "Speech and expression" },
+  { t: "Anti-discrimination laws should cover workplace speech, even when it is controversial.", axis: "S", dir: -1, topic: "Speech and expression" },
+  { t: "Police should need a warrant to access phone location data.", axis: "S", dir: 1, topic: "Privacy and security" },
+  { t: "Tech companies should be required to build access for criminal investigations.", axis: "S", dir: -1, topic: "Privacy and security" },
+  { t: "Random drug testing of public benefit recipients is reasonable.", axis: "S", dir: -1, topic: "Privacy and security" },
+  { t: "Parents should have the final say over their children's medical decisions.", axis: "S", dir: 1, topic: "Personal choice" },
+  { t: "Government should ban the sale of tobacco and flavored vapes.", axis: "S", dir: -1, topic: "Personal choice" },
+  { t: "Adults should be able to sell a kidney for compensation under regulated conditions.", axis: "S", dir: 1, topic: "Personal choice" },
+  { t: "Marriage should be defined by law as a union between a man and a woman.", axis: "S", dir: -1, topic: "Tradition and identity" },
+  { t: "Cultural traditions should be protected even when they conflict with individual choice.", axis: "S", dir: -1, topic: "Tradition and identity" },
+  { t: "Immigrants should be expected to fully adopt the national language and customs.", axis: "S", dir: -1, topic: "Tradition and identity" },
+  { t: "Governments should be able to restrict some civil rights during emergencies.", axis: "S", dir: -1, topic: "Rights and freedoms" },
+  { t: "Religious liberty should allow exemptions from some general laws.", axis: "S", dir: 1, topic: "Rights and freedoms" },
+  { t: "Concealed carry should be allowed without a permit.", axis: "S", dir: 1, topic: "Rights and freedoms" }
+];
+
+// ---------- 30 ideology profiles ----------
+// Order of values matches TOPICS. Positive = market (econ) or liberty/change (social).
+const IDEOLOGIES = [
+  { n: "Classical liberal", d: "Limited government, free markets, and strong individual rights.", p: [60,50,50,60,50,70,60,70,20,70] },
+  { n: "Libertarian", d: "Minimal state with maximum personal and economic freedom.", p: [80,80,90,80,90,90,80,95,30,90] },
+  { n: "Anarcho-capitalist", d: "No state; voluntary exchange and private institutions handle public needs.", p: [95,90,100,95,100,85,85,95,40,85] },
+  { n: "Minarchist", d: "A night-watchman state limited to courts, police, and defense.", p: [50,40,60,40,40,60,30,50,0,60] },
+  { n: "Fiscal conservative", d: "Low taxes, balanced budgets, and skepticism of new spending.", p: [70,50,50,30,30,20,0,40,-30,40] },
+  { n: "Traditional conservative", d: "Continuity, institutions, and inherited norms guide change.", p: [30,0,20,0,0,-30,-40,-30,-85,-10] },
+  { n: "Paleoconservative", d: "Restraint abroad, localism, and protection of traditional communities.", p: [40,10,20,20,10,-20,-30,-40,-95,-20] },
+  { n: "National conservative", d: "A strong nation-state, shared culture, and skepticism of global institutions.", p: [20,-10,0,-20,-10,-20,-40,-30,-85,-30] },
+  { n: "Neoconservative", d: "Active foreign policy and market-friendly economics with traditional social views.", p: [40,20,20,0,0,-10,-30,-10,-50,20] },
+  { n: "Christian democrat", d: "Social welfare and a market economy grounded in community and faith.", p: [-20,-30,-10,-10,-40,-10,-30,-30,-60,-10] },
+  { n: "Center-right pragmatist", d: "Market-friendly policy with a practical willingness to use government.", p: [30,20,20,20,10,20,10,10,-20,20] },
+  { n: "Centrist", d: "A mix of market and public solutions, judged case by case.", p: [0,-10,10,10,0,10,0,10,0,10] },
+  { n: "Liberal", d: "Individual rights, a mixed economy, and public programs with broad social change.", p: [-40,-50,-30,-30,-40,-10,-20,20,30,50] },
+  { n: "Progressive", d: "Reducing inequality and expanding rights through government action.", p: [-60,-70,-60,-60,-60,-20,-40,20,40,60] },
+  { n: "Social democrat", d: "A strong welfare state and worker protections within a market economy.", p: [-50,-70,-50,-60,-70,0,-20,10,-10,40] },
+  { n: "Democratic socialist", d: "Public or worker ownership of key industries through democratic means.", p: [-80,-90,-80,-90,-90,10,-30,10,20,50] },
+  { n: "Green", d: "Environmental protection and sustainability as central organizing principles.", p: [-50,-40,-80,-50,-50,10,-10,20,30,40] },
+  { n: "Communitarian", d: "Shared obligations, civic life, and community over pure individualism.", p: [-30,-20,-10,-20,-30,-20,-20,-20,-50,0] },
+  { n: "Populist left", d: "Anti-elite economics that favor ordinary workers over large institutions.", p: [-70,-80,-50,-80,-80,-10,-40,-10,-20,10] },
+  { n: "Populist right", d: "Anti-elite politics centered on nation, borders, and traditional values, with economic protection.", p: [-20,-10,-30,-40,-20,-40,-60,-40,-70,-30] },
+  { n: "Economic nationalist", d: "Tariffs, domestic industry, and national economic independence.", p: [-30,-30,-40,-30,-30,-30,-40,-30,-60,-30] },
+  { n: "Keynesian", d: "Government spending and regulation to steady the economy in downturns.", p: [-30,-20,-10,-10,-20,10,-10,10,0,10] },
+  { n: "Marxist-socialist", d: "Class analysis and collective ownership of the means of production.", p: [-100,-100,-100,-100,-100,-40,-50,-20,20,20] },
+  { n: "State communist", d: "A single-party state directing a planned economy.", p: [-100,-100,-100,-100,-100,-60,-70,-40,-20,0] },
+  { n: "Anarcho-communist", d: "A stateless society with collective ownership and mutual aid.", p: [-100,-100,-100,-100,-100,90,80,90,40,90] },
+  { n: "Georgist", d: "Tax land value rather than labor and improvements, with open markets.", p: [0,-10,-20,10,-20,20,0,20,0,20] },
+  { n: "Social market", d: "A competitive market economy paired with a strong social safety net.", p: [20,-10,-10,0,-20,10,-10,10,-10,20] },
+  { n: "Religious conservative", d: "A faith-based moral order guiding law and family life.", p: [10,-10,10,0,-10,-40,-60,-60,-90,-60] },
+  { n: "Ordoliberal", d: "Rules-based competition enforced by a strong, neutral state.", p: [10,-10,-10,0,-20,0,-10,0,-20,10] },
+  { n: "Civil libertarian", d: "Free speech, privacy, and personal autonomy, combined with social progressivism.", p: [-20,-20,-10,-10,-20,95,95,85,40,95] }
+];
+
+// ---------- Book bank ----------
+const BOOKS = [
+  { t: "The Road to Serfdom", a: "Friedrich Hayek", y: 1944, ide: ["Classical liberal","Libertarian","Fiscal conservative","Minarchist"], int: ["Philosophy","History"] },
+  { t: "Capitalism and Freedom", a: "Milton Friedman", y: 1962, ide: ["Classical liberal","Fiscal conservative","Libertarian"], int: ["Finance"] },
+  { t: "The Wealth of Nations", a: "Adam Smith", y: 1776, ide: ["Classical liberal"], int: ["Finance","History"] },
+  { t: "On Liberty", a: "John Stuart Mill", y: 1859, ide: ["Classical liberal","Civil libertarian"], int: ["Philosophy"] },
+  { t: "Anarchy, State, and Utopia", a: "Robert Nozick", y: 1974, ide: ["Libertarian","Minarchist"], int: ["Philosophy","Debate"] },
+  { t: "Liberalism", a: "Ludwig von Mises", y: 1927, ide: ["Libertarian","Classical liberal"], int: ["Philosophy","Finance"] },
+  { t: "For a New Liberty", a: "Murray Rothbard", y: 1973, ide: ["Anarcho-capitalist"], int: ["Philosophy"] },
+  { t: "Basic Economics", a: "Thomas Sowell", y: 2000, ide: ["Fiscal conservative","Classical liberal"], int: ["Finance"] },
+  { t: "Progress and Poverty", a: "Henry George", y: 1879, ide: ["Georgist"], int: ["Finance","History"] },
+  { t: "Coming Apart", a: "Charles Murray", y: 2012, ide: ["Traditional conservative","Fiscal conservative"], int: ["History","Psychology"] },
+  { t: "A History of the American People", a: "Paul Johnson", y: 1997, ide: ["Traditional conservative","Classical liberal"], int: ["History"] },
+  { t: "Reflections on the Revolution in France", a: "Edmund Burke", y: 1790, ide: ["Traditional conservative"], int: ["History","Philosophy"] },
+  { t: "The Virtue of Nationalism", a: "Yoram Hazony", y: 2018, ide: ["National conservative","Economic nationalist"], int: ["Philosophy","Debate"] },
+  { t: "Why Liberalism Failed", a: "Patrick Deneen", y: 2018, ide: ["Communitarian","Traditional conservative","Paleoconservative"], int: ["Philosophy","Debate"] },
+  { t: "Justice: What's the Right Thing to Do?", a: "Michael Sandel", y: 2009, ide: ["Communitarian","Social democrat","Liberal"], int: ["Philosophy","Debate"] },
+  { t: "A Theory of Justice", a: "John Rawls", y: 1971, ide: ["Liberal","Social democrat"], int: ["Philosophy","Debate"] },
+  { t: "Capital in the Twenty-First Century", a: "Thomas Piketty", y: 2013, ide: ["Social democrat","Progressive","Democratic socialist"], int: ["Finance","History"] },
+  { t: "The Price of Inequality", a: "Joseph Stiglitz", y: 2012, ide: ["Progressive","Social democrat"], int: ["Finance"] },
+  { t: "The Great Transformation", a: "Karl Polanyi", y: 1944, ide: ["Social democrat","Keynesian","Green"], int: ["History","Philosophy"] },
+  { t: "Between the World and Me", a: "Ta-Nehisi Coates", y: 2015, ide: ["Progressive","Civil libertarian"], int: ["History"] },
+  { t: "A People's History of the United States", a: "Howard Zinn", y: 1980, ide: ["Progressive","Populist left","Marxist-socialist"], int: ["History"] },
+  { t: "Debt: The First 5,000 Years", a: "David Graeber", y: 2011, ide: ["Anarcho-communist","Populist left"], int: ["History","Finance"] },
+  { t: "Mutual Aid", a: "Peter Kropotkin", y: 1902, ide: ["Anarcho-communist"], int: ["History","Philosophy"] },
+  { t: "The Communist Manifesto", a: "Karl Marx and Friedrich Engels", y: 1848, ide: ["Marxist-socialist","State communist"], int: ["History","Philosophy","Debate"] },
+  { t: "The Ascent of Money", a: "Niall Ferguson", y: 2008, ide: [], int: ["Finance","History"] },
+  { t: "The Intelligent Investor", a: "Benjamin Graham", y: 1949, ide: [], int: ["Finance"] },
+  { t: "Reconstruction: America's Unfinished Revolution", a: "Eric Foner", y: 1988, ide: [], int: ["History"] },
+  { t: "The Power Broker", a: "Robert Caro", y: 1974, ide: [], int: ["History","Debate"] },
+  { t: "Democracy in America", a: "Alexis de Tocqueville", y: 1835, ide: [], int: ["History","Debate"] },
+  { t: "Political Order and Political Decay", a: "Francis Fukuyama", y: 2014, ide: [], int: ["History","Philosophy"] },
+  { t: "The Righteous Mind", a: "Jonathan Haidt", y: 2012, ide: [], int: ["Psychology","Philosophy"] },
+  { t: "Why We're Polarized", a: "Ezra Klein", y: 2020, ide: [], int: ["Psychology","Debate"] }
+];
+
+// ---------- Plain-language explanations (for "Don't know?") ----------
+// Order matches CORE (0-49) and BANK (0-29).
+const EX_CORE = [
+  // Taxes
+  { s: "This asks whether people who earn the most should pay a bigger percentage of their income in tax than people who earn less.", terms: [["Progressive tax","A tax where the percentage rises as income rises."],["Share of income","The portion of your earnings paid in tax, not the dollar amount."]], b: [["Fairness:","People with more money can often afford a larger share, and taxes fund public services."],["Economic effects:","High rates may discourage work, saving, investment, and business growth."]] },
+  { s: "This asks whether lowering taxes helps the economy grow faster than spending the same money through government.", terms: [["Economic growth","The rise in the total value of goods and services a country produces."],["Public spending","Money government spends on things like roads, schools, and defense."]], b: [["Core debate:","Whether money does more good in private hands or in government programs."],["Evidence:","Economists disagree about how large the effect of tax cuts is, and how fast it appears."]] },
+  { s: "This asks whether money or property passed on after someone dies should be taxed.", terms: [["Inheritance tax","A tax on property or money a person receives after another person dies."],["Large estate","A very valuable inheritance, often worth millions of dollars."]], b: [["Fairness view:","Taxing big inheritances can reduce wealth gaps between generations."],["Opposing view:","Families may feel the money was already taxed, and some family businesses may have to be sold to pay."]] },
+  { s: "This asks whether the government should cut its spending before it collects more money from taxpayers.", terms: [["Budget deficit","When government spends more than it collects in a year."],["Tax increase","A rise in the rate or the amount people owe."]], b: [["Core debate:","Whether the best way to balance the budget is to spend less or to earn more."],["Trade-off:","Cuts can hurt people who rely on services, while higher taxes can slow private spending."]] },
+  { s: "This asks whether big companies should pay a larger share of their profits in tax than they do now.", terms: [["Corporate tax rate","The percentage of company profits paid to government."],["Corporation","A company treated by law as separate from its owners."]], b: [["Supporters say:","Large companies use public roads, courts, and workers trained by public schools, so they can pay more."],["Critics say:","Companies may pass costs on to workers and customers, or move operations elsewhere."]] },
+  // Healthcare
+  { s: "This asks whether government should make sure every person has health coverage, usually paid for through taxes.", terms: [["Universal healthcare","A system where everyone is covered, regardless of income or job."],["Coverage","Insurance that pays for medical care when you need it."]], b: [["Supporters say:","Health is a basic need, and coverage keeps people from going bankrupt over illness."],["Critics say:","Government systems can raise taxes, create waiting lists, and limit choice."]] },
+  { s: "This asks whether most people should get health insurance mainly from private companies, often through a job or their own purchase.", terms: [["Private insurance","Coverage sold by companies rather than run by government."],["Employer-sponsored coverage","Health insurance offered through a job."]], b: [["Supporters say:","Competition among companies can bring more choice and better service."],["Critics say:","Many people go without coverage, or face high costs and complicated rules."]] },
+  { s: "This asks whether government should decide the maximum price for prescription medicines.", terms: [["Price cap","A legal limit on how much something can cost."],["Prescription drug","A medicine that needs a doctor's order to buy."]], b: [["Supporters say:","Price limits help people afford medicine they need to stay alive."],["Critics say:","Caps may discourage companies from developing new drugs."]] },
+  { s: "This asks whether healthcare gets better when many private doctors, hospitals, and insurers compete for patients.", terms: [["Competition","Businesses trying to win customers with lower prices or better service."],["Provider","A doctor, hospital, or clinic that delivers care."]], b: [["Supporters say:","Competition pushes quality up and costs down."],["Critics say:","Patients often cannot compare prices, and emergencies leave little time to shop around."]] },
+  { s: "This asks whether government health programs, such as Medicare in the United States, should cover more people, for example by lowering the eligibility age.", terms: [["Public insurance","Health coverage paid for and run by government."],["Eligibility","The rules that decide who qualifies for a program."]], b: [["Supporters say:","More people covered means fewer medical debts and healthier communities."],["Critics say:","Expansion is expensive and can raise taxes or deficits."]] },
+  // Regulation
+  { s: "This asks whether big industries that affect everyone, like energy and banking, should be watched and controlled closely by government rules.", terms: [["Oversight","Watching and checking that companies follow the rules."],["Regulation","Laws and rules that govern how businesses operate."]], b: [["Supporters say:","These industries can cause large harm, such as financial collapses or pollution."],["Critics say:","Heavy rules can raise costs, slow innovation, and favor large firms that can afford compliance."]] },
+  { s: "This asks whether the rules government sets for business usually do more harm than good, once their costs are counted.", terms: [["Compliance cost","The money and time a business spends following a rule."],["Cost-benefit","Comparing what a rule costs with what it achieves."]], b: [["Supporters say:","Rules pile up, cost small businesses a lot, and often fail to deliver what they promise."],["Critics say:","Many rules prevent serious harms, like unsafe food or dangerous workplaces, so their benefits can be large."]] },
+  { s: "This asks whether banks should face stricter laws, such as keeping more money as a cushion, to prevent another economic meltdown.", terms: [["Financial crisis","A sudden collapse in banking or markets that hurts the wider economy."],["Capital requirement","The minimum amount of money a bank must keep as a cushion against losses."]], b: [["Supporters say:","The 2008 financial crisis showed that risky bank behavior can cost taxpayers a lot."],["Critics say:","Strict rules can push lending to less regulated places and limit credit for ordinary borrowers."]] },
+  { s: "This asks whether government should require cleaner air, water, or products even if the rules make things cost more.", terms: [["Environmental standard","A legal limit on pollution, or a required practice that protects nature or health."],["Consumer price","What shoppers pay for goods and services."]], b: [["Supporters say:","Clean air and water are shared resources that markets often ignore."],["Critics say:","Higher prices hit families with lower incomes hardest."]] },
+  { s: "This asks whether companies should choose their own way to reach environmental targets instead of following specific government methods.", terms: [["Market-based solution","An approach that uses prices or trading, such as a carbon price, to cut pollution."],["Mandate","A rule that requires one specific method."]], b: [["Supporters say:","Companies often find cheaper, smarter ways than regulators can predict."],["Critics say:","Without firm rules, companies may pick the cheapest option rather than the most effective one."]] },
+  // Labor and wages
+  { s: "This asks whether a legal lowest hourly pay is, on balance, bad for workers and the economy.", terms: [["Minimum wage","The lowest hourly pay employers are legally allowed to offer."],["Employment","The number of people who have jobs."]], b: [["Supporters say:","Minimum wages lift the lowest-paid workers out of poverty and reduce turnover."],["Critics say:","If the wage is set too high, some employers hire fewer people, especially young or low-skilled workers."]] },
+  { s: "This asks whether organizations that bargain for workers with employers are necessary to protect workers.", terms: [["Labor union","A group of workers that negotiates pay and conditions with employers."],["Collective bargaining","Negotiating pay and conditions for a whole group of workers at once."]], b: [["Supporters say:","Individual workers have little power against large employers without a union."],["Critics say:","Unions can raise costs, limit flexibility, and protect insiders at the expense of others."]] },
+  { s: "This asks whether pay and job terms should be settled privately between workers and employers, without laws setting them.", terms: [["Mandate","A rule that legally requires something."],["Negotiate","To discuss terms until both sides agree."]], b: [["Supporters say:","Private deals let pay reflect each job's real value and each worker's needs."],["Critics say:","Workers with less bargaining power may be taken advantage of without legal floors."]] },
+  { s: "This asks whether employers should have to pay workers who take time off for a new baby or a serious family illness.", terms: [["Paid family leave","Time off to care for family, paid through a partial wage replacement."],["Employer mandate","A legal requirement placed on businesses."]], b: [["Supporters say:","Paid leave helps families and keeps parents in the workforce."],["Critics say:","Small businesses may struggle to pay for leave or to cover for absent workers."]] },
+  { s: "This asks whether companies should be free to decide working hours, breaks, and perks without laws requiring them.", terms: [["Benefits","Extras beyond wages, such as health insurance or retirement contributions."],["Schedule","When and for how long employees work."]], b: [["Supporters say:","Flexible rules let employers adapt to customers and let workers choose jobs that suit them."],["Critics say:","Without rules, some workers can face long hours and few protections."]] },
+  // Welfare and education
+  { s: "This asks whether government should pay tuition at public colleges for students who meet income or other requirements.", terms: [["Tuition","The fee a school charges for teaching."],["Qualify","To meet a program's rules, such as having a low income."]], b: [["Supporters say:","Free college opens doors for people who could not otherwise afford it."],["Critics say:","It costs taxpayers a lot, and wealthier students may benefit more than expected."]] },
+  { s: "This asks whether government should guarantee a minimum regular income for people who cannot work.", terms: [["Basic income floor","A guaranteed minimum amount of money from government."],["Means-tested","Only given to people below an income level."]], b: [["Supporters say:","A safety net prevents severe poverty and protects people during illness or disability."],["Critics say:","Large payments could discourage work, and they can be expensive to fund."]] },
+  { s: "This asks whether giving families public money to pay for a school of their choice makes education better.", terms: [["School voucher","Public money a family can use toward tuition at a school it chooses."],["Public school","A school funded and run by government."]], b: [["Supporters say:","Choice and competition push schools to improve."],["Critics say:","Vouchers can drain money from public schools and may not help the lowest-income students."]] },
+  { s: "This asks whether homes are best built mainly by private companies rather than by government housing agencies.", terms: [["Supply","The number of homes available to buy or rent."],["Public housing","Homes built and managed by government."]], b: [["Supporters say:","Private builders respond to demand and can add homes quickly."],["Critics say:","Private markets may not house people with the lowest incomes without public help."]] },
+  { s: "This asks whether churches, nonprofits, and neighbors help people in need better than government welfare programs do.", terms: [["Welfare program","A government benefit for people in need."],["Nonprofit","An organization that serves a public purpose rather than making profit for owners."]], b: [["Supporters say:","Local groups know their communities and often offer more personal care."],["Critics say:","Charities may lack the money or reach, and help can vary a lot from place to place."]] },
+  // Speech and expression
+  { s: "This asks whether people should be protected by law when they say things most others reject.", terms: [["Legal consequences","Penalties set by law, such as fines or jail."],["Unpopular opinion","A view that most people reject or dislike."]], b: [["Supporters say:","Open debate helps society find the truth and protects unusual minority views."],["Critics say:","Some speech causes real harm, such as threats or false claims that hurt people."]] },
+  { s: "This asks whether speech that attacks people for who they are, such as their race or religion, should be illegal.", terms: [["Hate speech","Speech that attacks or demeans people based on traits like race or religion."],["Restriction","A legal limit or ban."]], b: [["Supporters say:","Some speech can incite violence and make groups feel unsafe."],["Critics say:","Defining hate speech is hard, and such laws can be used to silence opponents."]] },
+  { s: "This asks whether protests that many people find offensive should still be legally protected.", terms: [["Protected speech","Expression that the law shields from punishment."],["Offensive","Likely to upset or insult many people."]], b: [["Supporters say:","Protection matters most when speech criticizes the powerful or the unpopular."],["Critics say:","Some protests disrupt others' lives or cross into harassment or threats."]] },
+  { s: "This asks whether schools and universities should restrict speech that students find hurtful or offensive.", terms: [["Campus speech","Expression on school or university grounds."],["Limit","To restrict or set boundaries on."]], b: [["Supporters say:","Schools have a duty to protect students from harassment and to keep learning safe."],["Critics say:","Schools are places to debate hard ideas, and limits can discourage open discussion."]] },
+  { s: "This asks whether laws should set rules for when social media and websites can take down posts.", terms: [["Online platform","A website or app where users post and share content."],["Content moderation","Deciding which posts stay up and which come down."]], b: [["Supporters say:","Clear rules protect users from abuse and make companies accountable."],["Critics say:","Government control over moderation can lead to censorship."]] },
+  // Privacy and security
+  { s: "This asks whether police and government agencies should be allowed to read or listen to private messages and calls if it may prevent crime.", terms: [["Surveillance","Close watching of people's activities or communications."],["Communications","Messages, calls, and emails."]], b: [["Supporters say:","Monitoring can catch criminals and attackers before they act."],["Critics say:","Watching innocent people can violate privacy and create power that can be abused."]] },
+  { s: "This asks whether people should be able to use codes that keep their data private, even from police holding a warrant.", terms: [["Encryption","Scrambling data so only people with the key can read it."],["Warrant","A court order allowing police to search or seize something."]], b: [["Supporters say:","Strong encryption protects everyone from hackers, stalkers, and abusive governments."],["Critics say:","Criminals can use it to hide evidence, and police may lose key investigations."]] },
+  { s: "This asks whether police should get wider authority, such as more power to stop and search people, to keep public order.", terms: [["Public order","The safe and peaceful functioning of society."],["Power","Legal authority to act."]], b: [["Supporters say:","Clear authority helps police respond to crime and protect communities."],["Critics say:","Broader powers can lead to unfair treatment, especially of minority groups."]] },
+  { s: "This asks whether cameras on streets and in parks reduce crime and make people safer.", terms: [["Surveillance camera","A camera that records people in public places."],["Crime deterrence","Stopping crime before it happens by making it riskier."]], b: [["Supporters say:","Cameras help solve crimes and may discourage them."],["Critics say:","Evidence on crime reduction is mixed, and cameras raise privacy concerns."]] },
+  { s: "This asks whether people should have the right and tools to keep their personal information away from government.", terms: [["Personal data","Information about a person, such as location or browsing history."],["Shield","To protect something from access."]], b: [["Supporters say:","Personal information is private and can be misused by authorities or hackers."],["Critics say:","Blocking access can also stop legitimate investigations."]] },
+  // Personal choice
+  { s: "This asks whether adults should be free to use drugs, with little or no criminal punishment for personal use.", terms: [["Decriminalization","Reducing or removing criminal penalties while keeping some rules."],["Penalty","A punishment for breaking a law."]], b: [["Supporters say:","Criminal punishment for personal use can harm people more than the drug does."],["Critics say:","Drug use can cause addiction and harm others, and penalties can deter it."]] },
+  { s: "This asks whether government should stay out of personal medical and bodily decisions, such as vaccines, abortion, or diet.", terms: [["Bodily autonomy","A person's right to make decisions about their own body."],["Dictate","To tell someone what they must do."]], b: [["Supporters say:","Adults should control their own bodies and health decisions."],["Critics say:","Some choices affect others, such as public health measures during an outbreak."]] },
+  { s: "This asks whether adults should be free to make choices others disapprove of, as long as those choices do not hurt other people.", terms: [["Harm principle","The idea that law should only limit actions that harm others."],["Immoral","Considered wrong by moral standards."]], b: [["Supporters say:","Personal freedom includes making choices that others dislike."],["Critics say:","Harm can be hard to define, and communities often set shared moral standards."]] },
+  { s: "This asks whether selling sex should be illegal for both sellers and buyers.", terms: [["Criminalize","To make something a crime."],["Sex work","Selling sexual services in exchange for money."]], b: [["Supporters say:","Criminalizing sex work protects people from exploitation and trafficking."],["Critics say:","Criminal penalties can make sex workers less safe and less likely to report abuse."]] },
+  { s: "This asks whether mentally capable adults with a terminal illness should be legally allowed to get a doctor's help to end their lives.", terms: [["Assisted dying","A doctor provides medication that a patient takes to end their own life."],["Terminal illness","An illness expected to cause death."]], b: [["Supporters say:","Adults should be able to decide how to face the end of their lives, with safeguards."],["Critics say:","Vulnerable people may feel pressure, and doctors may face hard ethical conflicts."]] },
+  // Tradition and identity
+  { s: "This asks whether laws should follow long-held cultural values or adapt as social attitudes change.", terms: [["Traditional values","Beliefs and customs passed down across generations."],["Social norms","Shared expectations about how people behave."]], b: [["Supporters say:","Long-tested customs hold communities together."],["Critics say:","Traditions can exclude people, and laws should protect rights as society changes."]] },
+  { s: "This asks whether schools should teach common values, such as good character and civic duty, to all students.", terms: [["Moral standards","Principles about what is right and wrong."],["Shared","Held in common by many people."]], b: [["Supporters say:","Shared values help students become responsible citizens."],["Critics say:","Families and communities differ in their values, and schools should respect that."]] },
+  { s: "This asks whether a common sense of national belonging is necessary for a country to work well.", terms: [["National identity","A shared sense of belonging to a nation."],["Cohesion","Stability and unity among people."]], b: [["Supporters say:","Shared identity builds trust and willingness to help one another."],["Critics say:","A strong national identity can exclude minorities and newcomers."]] },
+  { s: "This asks whether religious organizations should decide their own internal rules, such as who leads them or who they admit as members.", terms: [["Internal practices","How an organization runs its own affairs."],["Religious freedom","The right to practice faith without government interference."]], b: [["Supporters say:","Government should not control religious doctrine or leadership."],["Critics say:","Religious groups should still follow general anti-discrimination laws."]] },
+  { s: "This asks whether immigration rules should focus on keeping a country's existing culture and social unity.", terms: [["Immigration policy","Laws that decide who may enter and stay in a country."],["Cultural cohesion","A shared culture that holds a society together."]], b: [["Supporters say:","Limits help newcomers and existing residents integrate and share common ground."],["Critics say:","Immigration brings economic and cultural benefits, and cultures change over time anyway."]] },
+  // Rights and freedoms
+  { s: "This asks whether same-sex couples should have equal legal rights, such as marriage, inheritance, and tax treatment.", terms: [["Same-sex couple","Two people of the same sex in a romantic relationship."],["Legal rights","Protections and benefits guaranteed by law."]], b: [["Supporters say:","Equal treatment under the law is a basic civil right."],["Critics say:","Some people believe marriage should be defined as between a man and a woman, based on religious or traditional views."]] },
+  { s: "This asks whether government should leave choices about raising children, such as schooling, discipline, and religion, to families.", terms: [["Parental rights","The legal authority parents have over their children's upbringing."],["Restrict","To limit or control."]], b: [["Supporters say:","Parents know their children best and should make most of these choices."],["Critics say:","Government must protect children from abuse and neglect."]] },
+  { s: "This asks whether gun ownership should be broadly protected, with few new laws limiting it.", terms: [["Gun ownership rights","The legal right to own firearms."],["Restriction","A limit or rule."]], b: [["Supporters say:","Gun ownership is a constitutional right and helps people defend themselves."],["Critics say:","Measures such as background checks can reduce violence."]] },
+  { s: "This asks whether public safety and order should come before people's right to protest in public.", terms: [["Public order","A safe and peaceful life in shared spaces."],["Freedom to protest","The legal right to gather and demonstrate."]], b: [["Supporters say:","Protests that block roads or threaten people can put others at risk."],["Critics say:","Protest is a core democratic right, and it matters most when people feel unheard."]] },
+  { s: "This asks whether government should stay out of deciding which books, art, or media are sold or shared.", terms: [["Censorship","Government or group control over what can be published or shown."],["Artwork","A creative work such as a painting, film, or song."]], b: [["Supporters say:","Free access to ideas and art supports learning and democracy."],["Critics say:","Some material, such as content harmful to children, may need limits."]] }
+];
+
+const EX_BANK = [
+  // Taxes
+  { s: "This asks whether everyone should pay the same percentage of income in tax, with fewer deductions and exemptions.", terms: [["Flat tax","One tax rate for all income levels."],["Deduction","An amount subtracted from income before tax is calculated."]], b: [["Supporters say:","A single rate is simple and treats everyone the same."],["Critics say:","It can shift the tax burden toward lower-income households."]] },
+  { s: "This asks whether government should tax the total value of very large fortunes each year, not just income.", terms: [["Wealth tax","An annual tax on the value of what someone owns."],["Fortune","A very large amount of money and property."]], b: [["Supporters say:","Very large fortunes can grow largely untaxed, and a wealth tax would address that."],["Critics say:","Valuing assets is hard, and wealthy people may move assets or leave the country."]] },
+  { s: "This asks whether helping working families through tax credits is better than raising the legal minimum wage.", terms: [["Tax credit","A reduction in the tax owed, which can sometimes be paid out even above the tax owed."],["Minimum wage","The lowest legal hourly pay."]], b: [["Supporters say:","Credits support workers without making employers pay more and possibly cut jobs."],["Critics say:","Credits are paid by taxpayers, while a wage floor is paid by employers and customers."]] },
+  // Healthcare
+  { s: "This asks whether hospitals should be required to publish clear prices for their services.", terms: [["Standardized price","A consistent, comparable price for a service."],["Price transparency","Making prices easy to find and compare."]], b: [["Supporters say:","Clear prices let patients compare options and avoid surprise bills."],["Critics say:","Hospitals say the rules are complex and costly to follow."]] },
+  { s: "This asks whether people should be able to buy health insurance from any state, not only their home state.", terms: [["State line","The boundary between states, which often limits insurance rules."],["Health plan","A policy that pays for medical care."]], b: [["Supporters say:","More choice and competition can lower premiums."],["Critics say:","State rules protect residents, and a national market could weaken those protections."]] },
+  { s: "This asks whether one public insurer covering everyone would control costs better than many competing insurers.", terms: [["Single-payer system","A system where one public agency pays for health care."],["Premium","The regular payment for insurance."]], b: [["Supporters say:","One large buyer has more bargaining power to lower prices."],["Critics say:","Less competition may mean less innovation and longer waits."]] },
+  // Regulation
+  { s: "This asks whether local rules on land use and building, such as zoning, make homes too expensive and should be loosened.", terms: [["Zoning","Local rules that decide what can be built where."],["Permit","Official approval to build or change something."]], b: [["Supporters say:","Fewer rules let builders add homes and can lower prices."],["Critics say:","Zoning protects neighborhoods from congestion and unwanted development."]] },
+  { s: "This asks whether government should be able to split up companies that become too powerful in their markets.", terms: [["Market dominance","Having so much of a market that competitors struggle."],["Antitrust","Laws that promote competition and limit monopolies."]], b: [["Supporters say:","Dominant firms can raise prices and block competitors."],["Critics say:","Breakups can reduce efficiency and hurt customers who like large services."]] },
+  { s: "This asks whether government permission should be required to work in some jobs, such as barbers or electricians, and whether that protects the public or limits workers.", terms: [["Occupational licensing","Government approval needed to work in a trade or profession."],["Barrier to entry","Something that makes it hard for new people to enter a field."]], b: [["Supporters say:","Licenses protect public safety, especially in skilled trades."],["Critics say:","Licenses can be expensive and can block people who could do the work well."]] },
+  // Labor and wages
+  { s: "This asks whether freelance and app-based workers should get the same benefits, such as sick pay, as regular employees.", terms: [["Gig worker","Someone paid per task or project rather than as a regular employee."],["Benefits","Extras such as sick leave or retirement contributions."]], b: [["Supporters say:","Gig workers face the same risks, so they deserve similar protections."],["Critics say:","Requiring benefits could lead companies to hire fewer gig workers and reduce flexibility."]] },
+  { s: "This asks whether workers should be able to keep a job without being required to join or pay dues to a union.", terms: [["Right-to-work law","A law that bans requiring union membership as a condition of a job."],["Union dues","Regular payments that support a union."]], b: [["Supporters say:","No one should be forced to pay for a union they did not choose."],["Critics say:","Unions argue that workers who benefit without paying weaken their bargaining power."]] },
+  { s: "This asks whether workers should be signed up for retirement savings automatically, unless they choose to opt out.", terms: [["Automatic enrollment","Signing people up by default unless they decline."],["Opt out","Choosing not to take part in something."]], b: [["Supporters say:","Many people do not start saving on their own, and defaults help them."],["Critics say:","Some people may not want the savings deducted from their pay."]] },
+  // Welfare and education
+  { s: "This asks whether benefits based on income, such as food assistance, make people depend on government and should be cut back.", terms: [["Means-tested","Available only to people below an income level."],["Dependency","Relying on others for support over a long period."]], b: [["Supporters say:","Benefits that shrink as income rises can discourage work."],["Critics say:","Cutting benefits can push vulnerable families into hardship."]] },
+  { s: "This asks whether government should pay for childcare for all families, so parents can work and children can get early education.", terms: [["Universal","Available to everyone, not only to people in need."],["Childcare","Care for young children while parents work."]], b: [["Supporters say:","Affordable childcare helps parents work and supports early learning."],["Critics say:","It is expensive, and families or private providers may be better placed to handle it."]] },
+  { s: "This asks whether standardized tests are a fair way to judge how well schools are doing.", terms: [["Standardized test","An exam given the same way to many students."],["Accountability","Being held responsible for results."]], b: [["Supporters say:","Tests give a common measure to compare schools and find ones that need help."],["Critics say:","Tests can narrow teaching and do not capture every kind of learning."]] },
+  // Speech and expression
+  { s: "This asks whether public universities should be barred from punishing professors for controversial research or opinions.", terms: [["Academic freedom","The right of scholars to research and teach without political interference."],["Punish","To discipline or penalize."]], b: [["Supporters say:","Scholars need freedom to pursue unpopular ideas that may later prove important."],["Critics say:","Academic freedom does not protect harassment or dishonest research."]] },
+  { s: "This asks whether social media companies should be legally required to remove false information.", terms: [["Misinformation","False information shared without intent to deceive."],["Legal requirement","A duty set by law."]], b: [["Supporters say:","False claims can cause real harm, such as health risks or confusion about elections."],["Critics say:","Deciding what is false can be biased, and a legal duty could lead to censorship."]] },
+  { s: "This asks whether anti-discrimination laws should protect workers from being treated unfairly for what they say, even when it is controversial.", terms: [["Anti-discrimination law","A law banning unfair treatment based on protected traits."],["Workplace speech","What employees say at or about their work."]], b: [["Supporters say:","Workers should not be fired for views that do not harm others at work."],["Critics say:","Employers need to be able to keep a respectful work environment."]] },
+  // Privacy and security
+  { s: "This asks whether police should need a court order before getting a person's phone location history.", terms: [["Warrant","A court order allowing a search or seizure."],["Location data","Records of where a phone has been."]], b: [["Supporters say:","Location history reveals intimate details and should need a judge's approval."],["Critics say:","Warrant requirements can slow urgent work, such as finding missing people."]] },
+  { s: "This asks whether tech companies should be required to build ways for police to access encrypted data.", terms: [["Backdoor","A hidden way into a system that bypasses normal security."],["Criminal investigation","An official inquiry into a crime."]], b: [["Supporters say:","Such access can help police solve serious crimes and protect children."],["Critics say:","Backdoors can be exploited by hackers and by abusive governments."]] },
+  { s: "This asks whether people receiving public benefits should be randomly tested for drug use.", terms: [["Random drug testing","Testing people without advance notice or a specific reason."],["Public benefit","Government help such as food or cash assistance."]], b: [["Supporters say:","Public money should support work and recovery, and testing can identify people who need help."],["Critics say:","Testing can punish people in need and costs money to run."]] },
+  // Personal choice
+  { s: "This asks whether parents should have the final say over children's medical care, even when doctors recommend otherwise.", terms: [["Medical decision","A choice about treatment."],["Final say","The authority to decide."]], b: [["Supporters say:","Parents are the people who should decide for their children's wellbeing."],["Critics say:","Doctors sometimes need to act to protect a child's life or health."]] },
+  { s: "This asks whether government should ban the sale of tobacco and flavored vaping products.", terms: [["Vape","A device that heats liquid into a vapor that is inhaled."],["Flavored","Containing added taste, such as fruit or candy."]], b: [["Supporters say:","Flavors attract young people and can lead to nicotine addiction."],["Critics say:","Some adults use flavored products to quit smoking, and bans can create black markets."]] },
+  { s: "This asks whether adults should be allowed to sell an organ, such as a kidney, for payment under regulation.", terms: [["Organ sale","Selling an organ for money."],["Regulated","Controlled by rules and oversight."]], b: [["Supporters say:","Adults should decide what to do with their own bodies, with safeguards in place."],["Critics say:","Payment can exploit poor people and harm donors' health."]] },
+  // Tradition and identity
+  { s: "This asks whether marriage should be defined in law as only between a man and a woman.", terms: [["Marriage definition","The legal meaning of marriage."],["Union","A formally recognized partnership."]], b: [["Supporters say:","A traditional definition reflects long-standing religious and cultural understanding."],["Critics say:","Limiting marriage denies equal rights to same-sex couples."]] },
+  { s: "This asks whether cultural customs should be protected by law even when they conflict with what individuals want.", terms: [["Cultural tradition","Customs shared by a community across time."],["Individual choice","A person's freedom to decide for themselves."]], b: [["Supporters say:","Traditions give communities identity and continuity."],["Critics say:","Individuals should be able to leave or reject traditions they disagree with."]] },
+  { s: "This asks whether immigrants should be expected to fully adopt the national language and customs.", terms: [["Assimilation","Adopting the culture of a new society."],["Integration","Taking part in society while keeping some of one's own identity."]], b: [["Supporters say:","A shared language and customs help newcomers succeed and connect."],["Critics say:","Many societies value cultural diversity and integration without full assimilation."]] },
+  // Rights and freedoms
+  { s: "This asks whether governments should be able to limit some civil rights during emergencies, such as a pandemic or war.", terms: [["Emergency powers","Special authority used during a crisis."],["Civil rights","Basic freedoms guaranteed to citizens."]], b: [["Supporters say:","Governments need flexibility to protect people during crises."],["Critics say:","Emergency powers often last longer than the emergency and can be abused."]] },
+  { s: "This asks whether people should be exempt from some general laws when those laws conflict with their religious beliefs.", terms: [["Exemption","Permission not to follow a rule."],["Religious liberty","The freedom to practice one's faith."]], b: [["Supporters say:","Religious freedom protects people from being forced to act against their beliefs."],["Critics say:","Exemptions can harm others or weaken equal treatment under the law."]] },
+  { s: "This asks whether people should be allowed to carry a hidden gun in public without a permit.", terms: [["Concealed carry","Carrying a hidden firearm in public."],["Permit","A license or approval from government."]], b: [["Supporters say:","Law-abiding people should not need permission to protect themselves."],["Critics say:","Permit systems help screen out people who should not carry guns."]] }
+];
+
+CORE.forEach((x, i) => { x.ex = EX_CORE[i]; x.id = 'c' + i; });
+BANK.forEach((x, j) => { x.ex = EX_BANK[j]; x.id = 'bank' + j; });
+
+// ---------- Charts for visual learners (illustrative numbers, computed in the page) ----------
+const C1 = "#2f5d8a", C2 = "#a4553a";
+function chartBox(title, inner, note) {
+  return `<div style="margin:14px 0"><div style="font-size:.88rem;font-weight:bold;margin-bottom:4px">${title}</div><svg viewBox="0 0 360 230" width="100%" style="max-width:440px;background:#fff;border:1px solid var(--line);border-radius:8px">${inner}</svg><div class="note" style="margin:4px 0 0">${note}</div></div>`;
+}
+function legend(names, colors) {
+  return names.map((n, i) => `<rect x="${20 + i * 150}" y="214" width="10" height="10" fill="${colors[i]}"/><text x="${34 + i * 150}" y="223" font-size="10" fill="#333">${n}</text>`).join("");
+}
+function barChart(title, cats, series, names, fmt, note) {
+  const L = 16, R = 8, T = 22, base = 190, W = 360, colors = [C1, C2];
+  const max = Math.max(...series.flat()) * 1.12 || 1;
+  const gw = (W - L - R) / cats.length, bw = gw * 0.8 / series.length;
+  let s = `<line x1="${L}" y1="${base}" x2="${W - R}" y2="${base}" stroke="#999"/>`;
+  cats.forEach((c, i) => {
+    series.forEach((ser, k) => {
+      const h = (ser[i] / max) * (base - T);
+      const x = L + i * gw + gw * 0.1 + k * bw;
+      s += `<rect x="${x}" y="${base - h}" width="${bw - 3}" height="${h}" fill="${colors[k]}"/><text x="${x + (bw - 3) / 2}" y="${base - h - 4}" font-size="10" text-anchor="middle" fill="#333">${fmt(ser[i])}</text>`;
+    });
+    s += `<text x="${L + i * gw + gw / 2}" y="${base + 14}" font-size="10" text-anchor="middle" fill="#555">${c}</text>`;
+  });
+  return chartBox(title, s + legend(names, colors), note);
+}
+function lineChart(title, xs, series, names, fmt, xfmt, note) {
+  const L = 48, R = 12, T = 18, base = 180, W = 360, colors = [C1, C2];
+  const max = Math.max(...series.flat()) * 1.1 || 1;
+  const X = i => L + (i / (xs.length - 1)) * (W - L - R);
+  const Y = v => base - (v / max) * (base - T);
+  let s = `<line x1="${L}" y1="${base}" x2="${W - R}" y2="${base}" stroke="#999"/><line x1="${L}" y1="${T}" x2="${L}" y2="${base}" stroke="#999"/>`;
+  s += `<text x="${L - 4}" y="${T + 3}" font-size="9" text-anchor="end" fill="#555">${fmt(max)}</text><text x="${L - 4}" y="${base + 3}" font-size="9" text-anchor="end" fill="#555">${fmt(0)}</text>`;
+  xs.forEach((x, i) => { s += `<text x="${X(i)}" y="${base + 14}" font-size="10" text-anchor="middle" fill="#555">${xfmt(x)}</text>`; });
+  series.forEach((ser, k) => {
+    s += `<polyline fill="none" stroke="${colors[k]}" stroke-width="2.5" points="${ser.map((v, i) => X(i) + "," + Y(v)).join(" ")}"/>`;
+    const last = ser.length - 1;
+    s += `<text x="${X(last)}" y="${Y(ser[last]) - 6}" font-size="10" text-anchor="end" fill="${colors[k]}">${fmt(ser[last])}</text>`;
+  });
+  return chartBox(title, s + legend(names, colors), note);
+}
+function supplyDemand(kind, title, note) {
+  let s = `<line x1="40" y1="20" x2="40" y2="180" stroke="#999"/><line x1="40" y1="180" x2="340" y2="180" stroke="#999"/>`;
+  s += `<text x="12" y="100" font-size="10" fill="#555" transform="rotate(-90 12 100)" text-anchor="middle">Price</text><text x="190" y="196" font-size="10" fill="#555" text-anchor="middle">Quantity</text>`;
+  s += `<line x1="60" y1="30" x2="320" y2="160" stroke="${C1}" stroke-width="2.5"/><text x="322" y="172" font-size="10" fill="${C1}" text-anchor="end">Demand</text>`;
+  s += `<line x1="60" y1="160" x2="320" y2="30" stroke="${C2}" stroke-width="2.5"/><text x="322" y="24" font-size="10" fill="${C2}" text-anchor="end">Supply</text>`;
+  s += `<circle cx="190" cy="95" r="4" fill="#333"/><text x="196" y="90" font-size="9" fill="#333">Free-market price</text>`;
+  const y = kind === "ceiling" ? 130 : 60;
+  s += `<line x1="40" y1="${y}" x2="340" y2="${y}" stroke="#333" stroke-dasharray="5 3"/><text x="44" y="${y - 4}" font-size="9" fill="#333">${kind === "ceiling" ? "Price cap" : "Price floor"}</text>`;
+  s += `<line x1="120" y1="${y}" x2="260" y2="${y}" stroke="#333" stroke-width="4"/><text x="190" y="${y + (kind === "ceiling" ? 16 : 16)}" font-size="9" text-anchor="middle" fill="#333">${kind === "ceiling" ? "Shortage" : "Surplus"}</text>`;
+  return chartBox(title, s, note);
+}
+function progTax(x) { return Math.min(x, 50000) * 0.10 + Math.max(0, Math.min(x, 150000) - 50000) * 0.25 + Math.max(0, x - 150000) * 0.35; }
+const money = v => v >= 1e6 ? "$" + (v / 1e6).toFixed(v % 1e6 ? 1 : 0) + "M" : v >= 1000 ? "$" + Math.round(v / 1000) + "k" : "$" + Math.round(v);
+const INC = [30000, 80000, 300000];
+const CHARTS = {
+  c0: () => barChart("Share of income paid in tax", ["$30k income", "$80k income", "$300k income"], [INC.map(x => progTax(x) / x * 100), [20, 20, 20]], ["Progressive", "Flat 20%"], v => v.toFixed(0) + "%", "Illustration only. The progressive example uses 10% up to $50k, 25% from $50k to $150k, and 35% above $150k."),
+  bank0: () => barChart("Dollars owed in tax", ["$30k income", "$80k income", "$300k income"], [INC.map(progTax), INC.map(x => x * 0.2)], ["Progressive", "Flat 20%"], money, "Illustration only, using the same example rates. A flat tax charges high earners more dollars but a smaller share."),
+  c2: () => lineChart("Tax owed on an inheritance (example)", [0, 5, 10, 15, 20], [[0, 5, 10, 15, 20].map(e => Math.max(0, (e - 5)) * 0.4 * 1e6)], ["Tax owed"], money, x => "$" + x + "M", "Illustration only. It assumes the first $5 million is exempt and 40% applies above that. Real rules differ and change."),
+  c3: () => barChart("Two ways to close a budget gap (in billions)", ["Today", "Cut spending", "Raise taxes"], [[100, 85, 100], [85, 85, 100]], ["Spending", "Revenue"], v => "$" + v, "Illustration only. Today spending is 100 and revenue is 85, a gap of 15. Either side can close it."),
+  c7: () => supplyDemand("ceiling", "What a price cap can do (classic textbook model)", "A cap set below the free-market price lowers what buyers pay, but the model predicts more people want the product than sellers will supply. Real drug markets are more complicated."),
+  c15: () => supplyDemand("floor", "What a price floor can do (classic textbook model)", "A minimum wage is a price floor on labor. In the simple model, a floor above the free-market wage leaves more people seeking work than there are jobs. Real studies find the effect depends on how high the floor is set."),
+  bank1: () => { const ys = [0, 2, 4, 6, 8, 10]; return lineChart("A $100M fortune over 10 years", ys, [ys.map(y => 100e6 * Math.pow(1.07, y)), ys.map(y => 100e6 * Math.pow(1.07 * 0.98, y))], ["No wealth tax", "2% yearly wealth tax"], money, y => "Yr " + y, "Illustration only. It assumes the fortune grows 7% a year and a 2% tax on total wealth is paid each year."); }
+};
+
+// ---------- Book reading levels ----------
+const LEVEL = {
+  "Basic Economics": 1, "Justice: What's the Right Thing to Do?": 1, "The Price of Inequality": 1, "Between the World and Me": 1,
+  "A People's History of the United States": 1, "The Ascent of Money": 1, "The Righteous Mind": 1, "Why We're Polarized": 1,
+  "The Wealth of Nations": 3, "On Liberty": 3, "Anarchy, State, and Utopia": 3, "Liberalism": 3, "Progress and Poverty": 3,
+  "Reflections on the Revolution in France": 3, "A Theory of Justice": 3, "Capital in the Twenty-First Century": 3,
+  "The Great Transformation": 3, "Reconstruction: America's Unfinished Revolution": 3, "The Power Broker": 3,
+  "Democracy in America": 3, "Political Order and Political Decay": 3
+};
+BOOKS.forEach(b => { b.lvl = LEVEL[b.t] || 2; });
+const LVL_NAME = ["", "Easy read", "Medium", "Challenging"];
+let READER = { max: 3, name: "Advanced", share: 0 };
+function readerLevel() {
+  const n = answers.filter(a => a !== null).length || 1;
+  const share = dk.size / n;
+  if (share >= 0.2) return { max: 1, name: "Starter", share };
+  if (share >= 0.08) return { max: 2, name: "Intermediate", share };
+  return { max: 3, name: "Advanced", share };
+}
+function readerNote() {
+  const pc = Math.round(READER.share * 100);
+  return `<p class="note" style="margin-top:0"><strong>Reading level: ${READER.name}.</strong> You used "Don't know" on ${dk.size} statement${dk.size === 1 ? "" : "s"} (${pc}%). ${READER.max < 3 ? "So the lists below put easier reads first." : "So the lists below include more challenging titles."}</p>`;
+}
+
+// ---------- Anonymous result code ----------
+function resultCode() {
+  const e = axisScore("E"), s = axisScore("S");
+  const n = answers.filter(a => a !== null).length;
+  const sg = v => (v < 0 ? "-" : "+") + String(Math.abs(v)).padStart(3, "0");
+  const body = answers.map((a, i) => (a === null ? "0" : a) + (dk.has(i) ? "d" : "")).join("");
+  let h = 2166136261;
+  for (const ch of body) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
+  return `PC1-E${sg(e)}-S${sg(s)}-D${String(dk.size).padStart(2, "0")}-N${String(n).padStart(2, "0")}-${h.toString(36).toUpperCase().padStart(6, "0").slice(-6)}`;
+}
+
+// Paste your Google Apps Script web app URL between the quotes to turn on opt-in submissions.
+const SUBMIT_URL = "";
+
+// ---------- State ----------
+let pool = [];
+let answers = [];
+let current = 0;
+let round2Done = false;
+let interests = [];
+let dk = new Set(); // pool indexes where the person used Don't know
+let sent = false;
+
+const $ = id => document.getElementById(id);
+const labels = ["Strongly disagree","Disagree","Neutral","Agree","Strongly agree"];
+
+$("startBtn").addEventListener("click", () => {
+  interests = [...document.querySelectorAll("#interestBox input:checked")].map(i => i.value);
+  pool = CORE.map(x => ({ ...x, round: 1 }));
+  dk = new Set();
+  sent = false;
+  answers = new Array(pool.length).fill(null);
+  current = 0;
+  round2Done = false;
+  $("intro").classList.add("hidden");
+  $("results").classList.add("hidden");
+  $("quiz").classList.remove("hidden");
+  render();
+});
+
+function render() {
+  const it = pool[current];
+  const selected = answers[current];
+  $("navRow").classList.remove("hidden");
+  $("questions").innerHTML = `
+    <div class="card">
+      <div class="topic">Round ${it.round} &middot; ${it.topic} &middot; ${it.axis === "E" ? "Economic" : "Social"}</div>
+      <p class="q">${current + 1}. ${it.t}</p>
+      <div class="scale">
+        ${labels.map((l, i) => `
+          <label>
+            <input type="radio" name="ans" value="${i + 1}" ${selected === i + 1 ? "checked" : ""}>
+            <span>${l}</span>
+          </label>`).join("")}
+      </div>
+    </div>`;
+  const answered = answers.filter(a => a !== null).length;
+  $("progress").textContent = `Statement ${current + 1} of ${pool.length}` + (round2Done ? " (includes round 2)" : "");
+  $("pct").textContent = `${answered} answered`;
+  $("barFill").style.width = (answered / pool.length * 100) + "%";
+  $("nextBtn").disabled = selected === null;
+  $("nextBtn").textContent = (current === pool.length - 1) ? "See my result" : "Next";
+  $("backBtn").disabled = current === 0;
+  $("questions").querySelector(".card").insertAdjacentHTML("beforeend", '<div style="margin-top:10px"><button class="ghost small" id="dkBtn">Don\'t know? Explain this statement</button></div>');
+  $("dkBtn").addEventListener("click", showExplain);
+  document.querySelectorAll('#questions input[name="ans"]').forEach(inp => {
+    inp.addEventListener("change", () => {
+      answers[current] = parseInt(inp.value, 10);
+      $("nextBtn").disabled = false;
+      render_progress_only();
+    });
+  });
+}
+
+// "Don't know?" view: plain-language explanation, then the same five choices
+function showExplain() {
+  const it = pool[current];
+  const ex = it.ex || { s: "No explanation is available for this statement yet.", terms: [], b: [] };
+  dk.add(current);
+  $("navRow").classList.add("hidden");
+  $("questions").innerHTML = `
+    <div class="card">
+      <div class="topic">Explanation &middot; ${it.topic}</div>
+      <p class="q">${current + 1}. ${it.t}</p>
+      <p style="margin-top:12px">${ex.s}</p>
+      ${CHARTS[it.id] ? CHARTS[it.id]() : ""}
+      <h3 style="font-size:1rem;margin:14px 0 4px">Key terms</h3>
+      <ul>${ex.terms.map(([w, d]) => `<li><strong>${w}:</strong> ${d}</li>`).join("")}</ul>
+      <h3 style="font-size:1rem;margin:14px 0 4px">The bigger picture</h3>
+      <ul>${ex.b.map(([l, t]) => `<li><strong>${l}</strong> ${t}</li>`).join("")}</ul>
+      <h3 style="font-size:1rem;margin:14px 0 4px">Based on these, what do you think?</h3>
+      <div class="scale">
+        ${labels.map((l, i) => `
+          <label>
+            <input type="radio" name="exans" value="${i + 1}" ${answers[current] === i + 1 ? "checked" : ""}>
+            <span>${l}</span>
+          </label>`).join("")}
+      </div>
+      <p class="note">Your choice is saved once you pick an answer.</p>
+    </div>`;
+  document.querySelectorAll('input[name="exans"]').forEach(inp => {
+    inp.addEventListener("change", () => {
+      answers[current] = parseInt(inp.value, 10);
+      render();
+    });
+  });
+}
+
+function render_progress_only() {
+  const answered = answers.filter(a => a !== null).length;
+  $("pct").textContent = `${answered} answered`;
+  $("barFill").style.width = (answered / pool.length * 100) + "%";
+}
+
+$("nextBtn").addEventListener("click", () => {
+  if (answers[current] === null) return;
+  // End of round 1: adapt
+  if (!round2Done && current === CORE.length - 1) {
+    showTransition();
+    return;
+  }
+  if (current < pool.length - 1) { current++; render(); }
+  else showResults();
+});
+
+$("backBtn").addEventListener("click", () => {
+  if (current > 0) { current--; render(); }
+});
+
+function showTransition() {
+  const picks = buildRound2();
+  $("navRow").classList.add("hidden");
+  $("progress").textContent = "Round 1 complete";
+  $("pct").textContent = "";
+  $("barFill").style.width = "100%";
+  $("questions").innerHTML = `
+    <div class="card">
+      <h2 style="margin-top:0">Round 1 complete</h2>
+      <p>Based on your answers, we picked <strong>${picks.length}</strong> follow-up statements on the topics where your views are least settled, or where the closest ideologies disagree most.</p>
+      <p class="note">Topics to refine: ${[...new Set(picks.map(p => p.topic))].join(", ")}.</p>
+      <button id="round2Btn">Continue to round 2</button>
+      <button class="ghost" id="skipBtn">Skip to results</button>
+    </div>`;
+  $("round2Btn").addEventListener("click", () => {
+    pool = pool.concat(picks.map(p => ({ ...p, round: 2 })));
+    answers = answers.concat(new Array(picks.length).fill(null));
+    round2Done = true;
+    current = CORE.length;
+    render();
+  });
+  $("skipBtn").addEventListener("click", showResults);
+}
+
+// Adaptive selection: favor topics where the user is less decided and where the closest candidate ideologies disagree.
+function buildRound2() {
+  const vec = topicVector();
+  const top = matchIdeologies(vec).slice(0, 5);
+  const ranked = TOPICS.map(name => {
+    const j = TOPICS.indexOf(name);
+    const vals = top.map(m => m.ideo.p[j]);
+    const spread = Math.max(...vals) - Math.min(...vals);
+    const uncertainty = 30 - Math.min(Math.abs(vec[name]), 30);
+    return { name, priority: spread + uncertainty };
+  }).sort((a, b) => b.priority - a.priority).slice(0, 4);
+  const picks = [];
+  ranked.forEach(r => {
+    BANK.filter(b => b.topic === r.name).slice(0, 2).forEach(b => picks.push(b));
+  });
+  return picks;
+}
+
+// ---------- Scoring ----------
+function contrib(it, a) { return ((a - 3) / 2) * it.dir; }
+
+function axisScore(axis) {
+  let s = 0, n = 0;
+  pool.forEach((it, i) => {
+    if (it.axis === axis && answers[i] !== null) { s += contrib(it, answers[i]); n++; }
+  });
+  return n ? Math.round((s / n) * 100) : 0;
+}
+
+function topicVector() {
+  const map = {};
+  pool.forEach((it, i) => {
+    if (answers[i] === null) return;
+    if (!map[it.topic]) map[it.topic] = { s: 0, n: 0 };
+    map[it.topic].s += contrib(it, answers[i]);
+    map[it.topic].n++;
+  });
+  const out = {};
+  TOPICS.forEach(t => { out[t] = map[t] && map[t].n ? Math.round((map[t].s / map[t].n) * 100) : 0; });
+  return out;
+}
+
+function matchIdeologies(vec) {
+  return IDEOLOGIES.map(ideo => {
+    let d = 0;
+    TOPICS.forEach((t, j) => { d += Math.pow(vec[t] - ideo.p[j], 2); });
+    return { ideo, closeness: Math.max(0, Math.round(100 - Math.sqrt(d / TOPICS.length))) };
+  }).map(m => ({ ideo: m.ideo, sim: m.closeness }))
+    .sort((a, b) => b.sim - a.sim);
+}
+
+function describe(score, leftWord, rightWord) {
+  if (score >= 40) return `strongly ${rightWord}`;
+  if (score >= 15) return `leaning ${rightWord}`;
+  if (score <= -40) return `strongly ${leftWord}`;
+  if (score <= -15) return `leaning ${leftWord}`;
+  return "near the middle";
+}
+
+function topicWord(score, axis) {
+  if (axis === "E") return score >= 15 ? "market-leaning" : score <= -15 ? "government-leaning" : "middle";
+  return score >= 15 ? "liberty-leaning" : score <= -15 ? "order-leaning" : "middle";
+}
+
+function topicAxis(name) { return pool.find(p => p.topic === name).axis; }
+
+// ---------- Results ----------
+function showResults() {
+  $("quiz").classList.add("hidden");
+  $("results").classList.remove("hidden");
+
+  const e = axisScore("E");
+  const s = axisScore("S");
+  const vec = topicVector();
+  const matches = matchIdeologies(vec);
+  const top3 = matches.slice(0, 3);
+
+  $("dot").setAttribute("cx", 200 + (e / 100) * 180);
+  $("dot").setAttribute("cy", 200 - (s / 100) * 180);
+  $("econLine").innerHTML = `<strong>Economic score: ${e}</strong>. Your answers are ${describe(e, "toward government-led economics", "toward market-led economics")}.`;
+  $("socLine").innerHTML = `<strong>Social score: ${s}</strong>. Your answers are ${describe(s, "toward order and tradition", "toward personal liberty")}.`;
+  $("econTick").style.left = ((e + 100) / 200 * 100) + "%";
+  $("socTick").style.left = ((s + 100) / 200 * 100) + "%";
+
+  const eWord = e >= 15 ? "market-leaning" : e <= -15 ? "government-leaning" : "economically centrist";
+  const sWord = s >= 15 ? "liberty-leaning" : s <= -15 ? "order-leaning" : "socially centrist";
+  $("quadLine").innerHTML = `<strong>Overall: ${eWord} and ${sWord}.</strong>`;
+
+  let cross;
+  if ((e >= 25 && s <= -25) || (e <= -25 && s >= 25)) {
+    cross = "Your two scores pull in different directions. Many people hold views like this, and it often means you weigh economic fairness and personal freedom differently depending on the issue.";
+  } else if (Math.abs(e) < 15 && Math.abs(s) < 15) {
+    cross = "Both scores sit near the middle. You may judge each issue on its details rather than on a broad ideology, or many of your answers may have been neutral.";
+  } else {
+    cross = "Your two scores point the same way, so your economic and social views fit a fairly consistent outlook.";
+  }
+  $("crossLine").textContent = cross;
+  $("codeText").textContent = resultCode();
+  $("consentBox").checked = false;
+  $("sendBtn").disabled = true;
+  $("sendMsg").textContent = sent ? "Already sent. Thank you." : "";
+  if (SUBMIT_URL) $("submitBox").classList.remove("hidden");
+
+  // Closest ideologies
+  $("ideoList").innerHTML = matches.slice(0, 5).map((m, k) => `
+    <div class="ideo">
+      <div><strong>${k + 1}. ${m.ideo.n}</strong><small>${m.ideo.d}</small></div>
+      <div class="score">${m.sim} / 100</div>
+    </div>`).join("");
+
+  // Books
+  READER = readerLevel();
+  $("books").innerHTML = readerNote() + renderBooks(matches, interests);
+
+  // Topic breakdown
+  $("topics").innerHTML = TOPICS.map(name => {
+    const score = vec[name];
+    const fromMid = Math.abs(score) / 2;
+    const start = score >= 0 ? 50 : 50 - fromMid;
+    return `
+      <div class="topic-row">
+        <span>${name}</span>
+        <div class="topic-bar"><div class="mid"></div><div class="fill" style="left:${start}%;width:${fromMid}%"></div></div>
+        <span>${topicWord(score, topicAxis(name))}</span>
+      </div>`;
+  }).join("");
+
+  // Insights
+  const answered = answers.filter(a => a !== null);
+  const neutralCount = answers.filter(a => a === 3).length;
+  const extremeCount = answers.filter(a => a === 1 || a === 5).length;
+  const sortedTopics = [...TOPICS].sort((a, b) => Math.abs(vec[b]) - Math.abs(vec[a]));
+  const clearest = sortedTopics[0];
+  const openest = sortedTopics[sortedTopics.length - 1];
+  const eVals = TOPICS.filter(t => topicAxis(t) === "E").map(t => vec[t]);
+  const sVals = TOPICS.filter(t => topicAxis(t) === "S").map(t => vec[t]);
+  const eSpread = Math.max(...eVals) - Math.min(...eVals);
+  const sSpread = Math.max(...sVals) - Math.min(...sVals);
+  const insights = [
+    `You answered <strong>${answered.length}</strong> statements. Neutral on <strong>${neutralCount}</strong>, extreme on <strong>${extremeCount}</strong>. ${extremeCount > answered.length / 2 ? "You tend to take firm positions." : "Your answers show a mix of firm and moderate views."}`,
+    `Your clearest position is on <strong>${clearest}</strong> (${topicWord(vec[clearest], topicAxis(clearest))}). Your most open area is <strong>${openest}</strong>.`,
+    `Within economics your topic scores vary by <strong>${eSpread}</strong> points, and within social issues by <strong>${sSpread}</strong>. ${Math.max(eSpread, sSpread) > 60 ? "You may hold different views on different parts of the same axis, so a single label rarely captures you." : "Your views on each axis are fairly consistent across topics."}`,
+    `Your closest ideology is <strong>${top3[0].ideo.n}</strong>, with <strong>${top3[1].ideo.n}</strong> and <strong>${top3[2].ideo.n}</strong> close behind. Compare how far apart those are on Taxes and Privacy and security to see where you actually differ from them.`
+  ];
+  if (dk.size) {
+    const cnt = {};
+    [...dk].forEach(i => { const t = pool[i].topic; cnt[t] = (cnt[t] || 0) + 1; });
+    const topDk = Object.entries(cnt).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([t, c]) => `${t} (${c})`).join(", ");
+    insights.push(`You used "Don't know" most on <strong>${topDk}</strong>. Those are good topics to read about next, and your book list is set to the <strong>${READER.name}</strong> reading level.`);
+  }
+  $("insights").innerHTML = "<ul>" + insights.map(i => `<li>${i}</li>`).join("") + "</ul>";
+
+  // Strongest statements
+  const ranked = pool.map((it, i) => ({ it, a: answers[i], c: answers[i] === null ? 0 : Math.abs(contrib(it, answers[i])) }))
+    .filter(x => x.c > 0.5)
+    .sort((a, b) => b.c - a.c)
+    .slice(0, 6);
+  $("strong").innerHTML = ranked.length
+    ? ranked.map(x => `
+        <div class="stmt"><span class="${x.a >= 4 ? 'good' : 'warn'}">${labels[x.a - 1]}</span> on: ${x.it.t}<span class="tag">${x.it.topic}</span></div>`).join("")
+    : `<p>No single statement stood out, which fits a more moderate pattern.</p>`;
+
+  $("reflect").innerHTML = [
+    `Which statement made you hesitate the most? What would change your answer?`,
+    `Pick one statement you disagreed with. What is the strongest argument someone who agrees would give?`,
+    `Read one of the opposing book picks. Which point do you find hardest to answer?`,
+    `Which topic would you most like to learn more about before deciding where you stand?`
+  ].map(p => `<li>${p}</li>`).join("");
+}
+
+function renderBooks(matches, chosenInterests) {
+  const used = new Set();
+  const pickOld = (arr, n) => {
+    const out = [];
+    for (const b of arr) {
+      if (out.length >= n) break;
+      if (!used.has(b.t)) { used.add(b.t); out.push(b); }
+    }
+    return out;
+  };
+  const pick = (arr, n) => {
+    let c = arr.filter(b => !used.has(b.t));
+    if (READER.max < 3) c = c.map((b, i) => ({ b, i, k: (b.lvl > READER.max ? 10 : 0) + b.lvl })).sort((x, y) => x.k - y.k || x.i - y.i).map(o => o.b);
+    const out = c.slice(0, n);
+    out.forEach(b => used.add(b.t));
+    return out;
+  };
+  const top = matches[0].ideo.n;
+  const topThree = matches.slice(0, 3).map(m => m.ideo.n);
+
+  // 1. Matches your leanings: books tagged to your top ideology, then the next two
+  let matchBooks = pick(BOOKS.filter(b => b.ide.includes(top)), 2);
+  if (matchBooks.length < 2) matchBooks = matchBooks.concat(pick(BOOKS.filter(b => b.ide.some(i => topThree.includes(i))), 2 - matchBooks.length));
+
+  // 2. Strongest opposing view: the least similar ideology that has books tagged to it
+  const opposites = [...matches].reverse();
+  let oppBooks = [];
+  let oppName = "";
+  for (const m of opposites) {
+    const found = pick(BOOKS.filter(b => b.ide.includes(m.ideo.n)), 2);
+    if (found.length) { oppBooks = found; oppName = m.ideo.n; break; }
+  }
+
+  // 3. Fits your interests
+  let interestBooks = [];
+  if (chosenInterests.length) {
+    interestBooks = pick(BOOKS.filter(b => b.int.some(i => chosenInterests.includes(i))), 3);
+  }
+
+  // 4. Balanced reading: no ideology tag
+  const balanced = pick(BOOKS.filter(b => b.ide.length === 0), 2);
+
+  const block = (title, note, list) => `
+    <h3 style="margin:14px 0 4px;font-size:1.02rem">${title}</h3>
+    ${note ? `<p class="note" style="margin:0 0 4px">${note}</p>` : ""}
+    ${list.length ? list.map(b => `<div class="book">${b.t}, ${b.a} <em>(${b.y}) &middot; ${LVL_NAME[b.lvl]}</em></div>`).join("") : `<p class="note">No suggestions here yet.</p>`}`;
+
+  return [
+    block("Matches your leanings", `Written from views close to ${top}.`, matchBooks),
+    block("The strongest opposing view", oppName ? `Written from ${oppName}, the profile least like yours.` : "", oppBooks),
+    block("Up your alley", chosenInterests.length ? `Based on your interests: ${chosenInterests.join(", ")}.` : "Pick interests on the first screen to get these suggestions.", interestBooks),
+    block("A balanced reading", "Less tied to one ideology.", balanced)
+  ].join("");
+}
+
+// ---------- Export ----------
+function buildRows() {
+  const e = axisScore("E"), s = axisScore("S");
+  const vec = topicVector();
+  const matches = matchIdeologies(vec);
+  const rows = [];
+  rows.push(["Free Political Compass Self-Check: results"]);
+  rows.push([]);
+  rows.push(["Economic score (-100 government to +100 market)", e]);
+  rows.push(["Social score (-100 order to +100 liberty)", s]);
+  rows.push(["Reading level", readerLevel().name]);
+  rows.push(["Statements marked Don't know", dk.size]);
+  rows.push(["Result code", resultCode()]);
+  rows.push([]);
+  rows.push(["Topic", "Score (-100 to 100)", "Axis"]);
+  TOPICS.forEach(t => rows.push([t, vec[t], topicAxis(t) === "E" ? "Economic" : "Social"]));
+  rows.push([]);
+  rows.push(["Closest ideologies", "Closeness (0-100)", "Description"]);
+  matches.slice(0, 8).forEach(m => rows.push([m.ideo.n, m.sim, m.ideo.d]));
+  rows.push([]);
+  rows.push(["Book suggestions", "Author", "Year"]);
+  BOOKS.filter(b => interests.some(i => b.int.includes(i)) || b.ide.includes(matches[0].ideo.n))
+    .slice(0, 8).forEach(b => rows.push([b.t, b.a, b.y]));
+  rows.push([]);
+  rows.push(["Round", "Topic", "Axis", "Statement", "Your answer", "Used Don't know"]);
+  pool.forEach((it, i) => rows.push([it.round, it.topic, it.axis === "E" ? "Economic" : "Social", it.t, answers[i] === null ? "" : labels[answers[i] - 1], dk.has(i) ? "Yes" : ""]));
+  return rows;
+}
+
+function csvEscape(v) {
+  const s = String(v === undefined || v === null ? "" : v);
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+
+function download(name, type, text) {
+  const blob = new Blob([text], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+$("csvBtn").addEventListener("click", () => {
+  const text = buildRows().map(r => r.map(csvEscape).join(",")).join("\r\n");
+  download("political_compass_results.csv", "text/csv;charset=utf-8", text);
+});
+
+// Builds a standard .xlsx file (a zip of XML parts) entirely in the browser, no library needed.
+function makeZip(entries) {
+  const crcTable = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    crcTable[n] = c >>> 0;
+  }
+  const crc32 = bytes => {
+    let c = 0xFFFFFFFF;
+    for (let i = 0; i < bytes.length; i++) c = crcTable[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  };
+  const enc = new TextEncoder();
+  const parts = [], central = [];
+  let offset = 0;
+  entries.forEach(({ name, data }) => {
+    const nameBytes = enc.encode(name);
+    const crc = crc32(data);
+    const size = data.length;
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0, true);
+    lh.setUint16(8, 0, true); lh.setUint16(10, 0, true); lh.setUint16(12, 33, true);
+    lh.setUint32(14, crc, true); lh.setUint32(18, size, true); lh.setUint32(22, size, true);
+    lh.setUint16(26, nameBytes.length, true); lh.setUint16(28, 0, true);
+    parts.push(new Uint8Array(lh.buffer), nameBytes, data);
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true);
+    ch.setUint16(8, 0, true); ch.setUint16(10, 0, true); ch.setUint16(12, 0, true); ch.setUint16(14, 33, true);
+    ch.setUint32(16, crc, true); ch.setUint32(20, size, true); ch.setUint32(24, size, true);
+    ch.setUint16(28, nameBytes.length, true); ch.setUint16(30, 0, true); ch.setUint16(32, 0, true);
+    ch.setUint16(34, 0, true); ch.setUint16(36, 0, true); ch.setUint32(38, 0, true); ch.setUint32(42, offset, true);
+    central.push(new Uint8Array(ch.buffer), nameBytes);
+    offset += 30 + nameBytes.length + size;
+  });
+  const cenSize = central.reduce((a, b) => a + b.length, 0);
+  const end = new DataView(new ArrayBuffer(22));
+  end.setUint32(0, 0x06054b50, true); end.setUint16(4, 0, true); end.setUint16(6, 0, true);
+  end.setUint16(8, entries.length, true); end.setUint16(10, entries.length, true);
+  end.setUint32(12, cenSize, true); end.setUint32(16, offset, true); end.setUint16(20, 0, true);
+  const all = [...parts, ...central, new Uint8Array(end.buffer)];
+  const total = all.reduce((a, b) => a + b.length, 0);
+  const out = new Uint8Array(total);
+  let p = 0;
+  all.forEach(b => { out.set(b, p); p += b.length; });
+  return out;
+}
+
+function downloadXlsx() {
+  const rows = buildRows();
+  const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  const col = j => String.fromCharCode(65 + j);
+  const sheetRows = rows.map((r, i) => {
+    const n = i + 1;
+    if (!r.length) return `<row r="${n}"/>`;
+    const cells = r.map((v, j) => {
+      const ref = col(j) + n;
+      if (typeof v === "number") return `<c r="${ref}"><v>${v}</v></c>`;
+      if (v === undefined || v === null || v === "") return "";
+      return `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${esc(v)}</t></is></c>`;
+    }).join("");
+    return `<row r="${n}">${cells}</row>`;
+  }).join("");
+  const H = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+  const NS = 'http://schemas.openxmlformats.org/';
+  const files = [
+    ["[Content_Types].xml", H + `<Types xmlns="${NS}package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>`],
+    ["_rels/.rels", H + `<Relationships xmlns="${NS}package/2006/relationships"><Relationship Id="rId1" Type="${NS}officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`],
+    ["xl/workbook.xml", H + `<workbook xmlns="${NS}spreadsheetml/2006/main" xmlns:r="${NS}officeDocument/2006/relationships"><sheets><sheet name="Results" sheetId="1" r:id="rId1"/></sheets></workbook>`],
+    ["xl/_rels/workbook.xml.rels", H + `<Relationships xmlns="${NS}package/2006/relationships"><Relationship Id="rId1" Type="${NS}officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="${NS}officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`],
+    ["xl/styles.xml", H + `<styleSheet xmlns="${NS}spreadsheetml/2006/main"><fonts count="1"><font><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`],
+    ["xl/worksheets/sheet1.xml", H + `<worksheet xmlns="${NS}spreadsheetml/2006/main"><cols><col min="1" max="1" width="60" customWidth="1"/><col min="2" max="5" width="22" customWidth="1"/></cols><sheetData>${sheetRows}</sheetData></worksheet>`]
+  ];
+  const enc = new TextEncoder();
+  const zip = makeZip(files.map(([name, text]) => ({ name, data: enc.encode(text) })));
+  download("political_compass_results.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", zip);
+}
+
+$("xlsBtn").addEventListener("click", downloadXlsx);
+
+$("consentBox").addEventListener("change", () => { $("sendBtn").disabled = !$("consentBox").checked || sent; });
+$("sendBtn").addEventListener("click", () => {
+  if (!SUBMIT_URL || !$("consentBox").checked || sent) return;
+  const payload = { code: resultCode(), e: axisScore("E"), s: axisScore("S"), dk: dk.size,
+    n: answers.filter(a => a !== null).length, level: readerLevel().name, topics: topicVector(), round2: round2Done };
+  $("sendBtn").disabled = true;
+  $("sendMsg").textContent = "Sending...";
+  fetch(SUBMIT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
+    .then(() => { sent = true; $("sendMsg").textContent = "Submitted. Thank you."; })
+    .catch(() => { $("sendBtn").disabled = false; $("sendMsg").textContent = "Could not send. Try again, or copy your result code instead."; });
+});
+
+$("copyBtn").addEventListener("click", () => {
+  const t = resultCode();
+  try { navigator.clipboard.writeText(t).then(() => { $("copyBtn").textContent = "Copied"; }, () => { $("copyBtn").textContent = t; }); }
+  catch (e) { $("copyBtn").textContent = t; }
+});
+
+$("restartBtn").addEventListener("click", () => {
+  $("results").classList.add("hidden");
+  $("intro").classList.remove("hidden");
+});
+</script>
+</body>
+</html>
